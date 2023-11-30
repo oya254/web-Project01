@@ -188,6 +188,47 @@ if(isset($_SESSION["cart_item"])){
 		    }
 	    }
 	    ?>
+        // ...
+<form class="product-item" method="post" action="promotion.php?action=add&code=<?php echo $product_array[$key]["code"]; ?>">
+    <!-- แสดงข้อมูลสินค้า -->
+    <input type="number" class="product-quantity" name="quantity" value="1"/>
+    <br><br>
+    <input class="1" type="submit" value="สั่งอาหาร" class="btnAddAction" />
+</form>
+// ...
+
+
+// ...
+if (!empty($_POST["quantity"])) {
+    // ดึงข้อมูลสินค้าจากฐานข้อมูลตามรหัส (code)
+    $productByCode = $db_handle->runQuery("SELECT * FROM food WHERE code='" . $_GET["code"] . "'");
+    $itemArray = array(
+        $productByCode[0]["code"] => array(
+            'name' => $productByCode[0]["name"],
+            'code' => $productByCode[0]["code"],
+            'quantity' => $_POST["quantity"],
+            'price' => $productByCode[0]["price"],
+            'image' => $productByCode[0]["image"]
+        )
+    );
+
+    // ตรวจสอบและเพิ่มข้อมูลสินค้าลงในตะกร้า
+    if (!empty($_SESSION["cart_item"])) {
+        if (in_array($productByCode[0]["code"], array_keys($_SESSION["cart_item"]))) {
+            // กรณีมีสินค้าในตะกร้าแล้ว
+            // ...
+        } else {
+            // กรณีไม่มีสินค้าในตะกร้า
+            $_SESSION["cart_item"] = array_merge($_SESSION["cart_item"], $itemArray);
+        }
+    } else {
+        // กรณีตะกร้าว่าง  
+        $_SESSION["cart_item"] = $itemArray;
+    }
+}
+// ...
+
+
     </div>
     </center>
 </body>
